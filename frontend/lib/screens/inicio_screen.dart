@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/login_screen.dart';
 
 class InicioScreen extends StatefulWidget {
   const new({super.key});
@@ -10,20 +11,27 @@ class InicioScreen extends StatefulWidget {
 class _InicioScreenState extends State<InicioScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _body(),
-    );
+    return Scaffold(body: _body());
   }
 
   Container _body() {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: BoxDecoration(
-        color: Color(0xFF1A419B)
-      ),
-      child: Center(
-        child: Text('Olá'),
+      decoration: BoxDecoration(color: Color(0xFF1A419B)),
+      child: Column(
+        children: [
+          Text('Olá'),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
+            child: const Text('Login'),
+          ),
+        ],
       ),
     );
   }
