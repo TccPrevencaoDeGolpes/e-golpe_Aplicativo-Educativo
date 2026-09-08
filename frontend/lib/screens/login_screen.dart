@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/components/button_custom.dart';
 import 'package:frontend/components/input_custom.dart';
+import 'package:frontend/main.dart';
+import 'package:frontend/service/autenticacao_service.dart';
 
-//statefull widget -> classe abstrata
-// obrigado a criar método createState
 class LoginScreen extends StatefulWidget {
-  const new({super.key});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -13,93 +15,277 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: _body());
+  final AutenticacaoService _autenticacaoService = AutenticacaoService();
+
+  bool _isLoading = false;
+
+  // SVG do Ícone Oficial do Google
+  static const String _googleSvgLogo = '''
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.7 17.74 9.5 24 9.5z"/>
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.2-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+  </svg>
+  ''';
+
+  Future<void> _efetuarLogin() async {
+    final loginText = emailController.text.trim();
+    final senhaText = senhaController.text.trim();
+
+    if (loginText.isEmpty || senhaText.isEmpty) {
+      messengerKey.currentState?.showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, preencha o e-mail/celular e a senha.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final usuario = await _autenticacaoService.fazerLogin(loginText, senhaText);
+
+    setState(() => _isLoading = false);
+
+    if (mounted) {
+      if (usuario != null) {
+        // Redireciona para a tela de Perfil em caso de sucesso
+        Navigator.of(context).pushReplacementNamed('/perfil');
+      } else {
+        messengerKey.currentState?.showSnackBar(
+          const SnackBar(
+            content: Text('E-mail/celular ou senha incorretos.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
-  Container _body() {
-    return Container(
-      //infinity -> usa todo espaço liberado
-      width: double.infinity,
-      height: double.infinity,
-      decoration: BoxDecoration(color: Color(0xFF1A419B)),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: Column(
+        children: [
+          // Header Azul
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 12,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
+            color: const Color(0xFF1E3A8A),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () {
+                    //limpar
+                    emailController.clear();
+                    senhaController.clear();
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    } else {
+                      Navigator.pushReplacementNamed(context, '/inicio');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEFF6FF), // Azul claro
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.chevron_left,
+                          color: Color(0xFF1E3A8A), // Azul escuro
+                          size: 20,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Voltar',
+                          style: TextStyle(
+                            color: Color(0xFF1E3A8A),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 const Text(
-                  'e-golpe',
+                  'Entrar',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 32,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w900,
                   ),
-                ),
-                const SizedBox(height: 35),
-                InputCustom(
-                  label: 'E-mail',
-                  icon: Icons.email_outlined,
-                  controller: emailController,
-                ),
-                const SizedBox(height: 20),
-                InputCustom(
-                  label: 'Senha',
-                  icon: Icons.lock_outline,
-                  controller: senhaController,
-                ),
-                const SizedBox(height: 20),
-
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 141, 32, 38),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    onPressed: () {},
-                    child: const Text(
-                      "Entrar",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Não tem uma conta?",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "Criar Conta",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
           ),
-        ),
+
+          // Conteúdo com Scroll
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Já tem conta no Google? Entre rapidinho',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Botão do Google sem ação
+                  OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 56),
+                      backgroundColor: Colors.white,
+                      side: const BorderSide(
+                        color: Color(0xFFCBD5E1),
+                        width: 2,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.string(
+                          _googleSvgLogo,
+                          width: 24,
+                          height: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Continuar com Google',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E293B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Divisor
+                  Row(
+                    children: const [
+                      Expanded(
+                        child: Divider(color: Color(0xFFCBD5E1), thickness: 1),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'ou use seu e-mail / celular',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF94A3B8),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(color: Color(0xFFCBD5E1), thickness: 1),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Campos de Texto
+                  const Text(
+                    'E-mail ou número de celular',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E3A8A),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InputCustom(
+                    controller: emailController,
+                    hintText: 'seu@email.com ou 11944443333',
+                    icon: Icons.email_outlined,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    'Senha',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E3A8A),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InputCustom(
+                    controller: senhaController,
+                    isPassword: true,
+                    icon: Icons.lock_outline,
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // Botão Principal
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ButtonCustom(
+                          label: 'Entrar →',
+                          variant: ButtonTipo.primary,
+                          onPressed: _efetuarLogin,
+                        ),
+
+                  const SizedBox(height: 16),
+
+                  // Redirecionamento para Cadastro
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed('/cadastro');
+                      },
+                      child: const Text(
+                        'Não tenho conta — Criar agora',
+                        style: TextStyle(
+                          color: Color(0xFF1E3A8A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
