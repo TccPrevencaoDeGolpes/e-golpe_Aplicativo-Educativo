@@ -61,7 +61,10 @@ class _InicioScreenState extends State<InicioScreen> {
                 // Seção Superior - Logo e Recursos
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 20.0,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -96,8 +99,12 @@ class _InicioScreenState extends State<InicioScreen> {
                           runSpacing: 10,
                           children: const [
                             _FeaturePill(text: '🛡️ Aprenda Segurança digital'),
-                            _FeaturePill(text: '⚠️ Caí em um golpe, o que fazer'),
-                            _FeaturePill(text: '🎯 é golpe? descubra se a mensagem é suspeita'),
+                            _FeaturePill(
+                              text: '⚠️ Caí em um golpe, o que fazer',
+                            ),
+                            _FeaturePill(
+                              text: '🎯 é golpe? descubra se a mensagem é suspeita',
+                            ),
                           ],
                         ),
                       ],
@@ -157,38 +164,12 @@ class _InicioScreenState extends State<InicioScreen> {
                       const SizedBox(height: 16),
 
                       // Botão Secundário - Fazer Login
-                      OutlinedButton(
+                      ButtonCustom(
+                        label: 'Fazer login',
+                        variant: ButtonTipo.neutral,
                         onPressed: () {
                           Navigator.pushNamed(context, '/login');
                         },
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 56),
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(color: Color(0xFFCBD5E1), width: 2),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(
-                              Icons.login_rounded,
-                              color: Color(0xFF1E3A8A),
-                              size: 22,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Fazer login',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E3A8A),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
 
                       const SizedBox(height: 14),

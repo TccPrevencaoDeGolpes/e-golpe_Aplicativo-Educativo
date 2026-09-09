@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/components/button_custom.dart';
 import 'package:frontend/service/usuario_service.dart';
+
 import '../model/usuario.dart';
 
 class PerfilScreen extends StatefulWidget {
@@ -11,13 +13,13 @@ class PerfilScreen extends StatefulWidget {
 
 class _PerfilScreenState extends State<PerfilScreen> {
   final UsuarioService _usuarioService = UsuarioService();
-  
+
   // Controle de estado da tela
   bool _isLoading = true;
   bool _isEditing = false;
-  
+
   // Simulação do ID do usuário logado (Em um app real, viria do provider/sessão)
-  final int _currentUserId = 1; 
+  final int _currentUserId = 1;
   Usuario? _usuario;
 
   // Controllers para edição de informações
@@ -30,7 +32,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
   // Controllers para alterar senha
   final TextEditingController _senhaAtualController = TextEditingController();
   final TextEditingController _novaSenhaController = TextEditingController();
-  final TextEditingController _confirmarSenhaController = TextEditingController();
+  final TextEditingController _confirmarSenhaController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -41,7 +44,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Future<void> _carregarDados() async {
     setState(() => _isLoading = true);
     final usuario = await _usuarioService.carregarUsuario(_currentUserId);
-    
+
     if (usuario != null) {
       setState(() {
         _usuario = usuario;
@@ -56,9 +59,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
     _nomeController.text = _usuario!.nome ?? '';
     _emailController.text = _usuario!.email ?? '';
     _celularController.text = _usuario!.celular ?? '';
-    _dataNascController.text = _usuario!.dataNascimento != null 
-    ? _usuario!.dataNascimento.toString().split(' ').first
-    : '';
+    _dataNascController.text = _usuario!.dataNascimento != null
+        ? _usuario!.dataNascimento.toString().split(' ').first
+        : '';
     _generoController.text = _usuario!.genero ?? '';
   }
 
@@ -74,7 +77,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
     _usuario!.dataNascimento = DateTime.parse(_dataNascController.text);
     _usuario!.genero = _generoController.text;
 
-    final sucesso = await _usuarioService.alterarUsuario(_currentUserId, _usuario!);
+    final sucesso = await _usuarioService.alterarUsuario(
+      _currentUserId,
+      _usuario!,
+    );
 
     setState(() {
       _isLoading = false;
@@ -84,7 +90,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(sucesso ? 'Informações salvas com sucesso!' : 'Erro ao salvar informações.'),
+          content: Text(
+            sucesso
+                ? 'Informações salvas com sucesso!'
+                : 'Erro ao salvar informações.',
+          ),
           backgroundColor: sucesso ? Colors.green : Colors.red,
         ),
       );
@@ -99,7 +109,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
     if (mounted) {
       if (sucesso) {
         // Redireciona para o Início limpando a pilha de navegação
-        Navigator.of(context).pushNamedAndRemoveUntil('/inicio', (route) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/inicio', (route) => false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -118,7 +129,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           contentPadding: const EdgeInsets.all(24),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -130,7 +143,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+                child: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.red,
+                  size: 28,
+                ),
               ),
               const SizedBox(height: 16),
               const Text(
@@ -161,14 +178,21 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   fillColor: Colors.red.shade50,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.red.shade200, width: 2),
+                    borderSide: BorderSide(
+                      color: Colors.red.shade200,
+                      width: 2,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.red.shade200, width: 2),
+                    borderSide: BorderSide(
+                      color: Colors.red.shade200,
+                      width: 2,
+                    ),
                   ),
                 ),
-                onChanged: (val) => (context as Element).markNeedsBuild(), // Atualiza estado local
+                onChanged: (val) => (context as Element)
+                    .markNeedsBuild(), // Atualiza estado local
               ),
               const SizedBox(height: 20),
               Row(
@@ -179,9 +203,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.grey.shade100,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: const Text('Cancelar', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'Cancelar',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -197,10 +229,18 @@ class _PerfilScreenState extends State<PerfilScreen> {
                         backgroundColor: Colors.red,
                         disabledBackgroundColor: Colors.red.shade200,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
                       ),
-                      child: const Text('Excluir', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'Excluir',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -236,12 +276,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('🔑 Alterar senha', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                  const Text(
+                    '🔑 Alterar senha',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close),
-                    style: IconButton.styleFrom(backgroundColor: Colors.grey.shade100),
-                  )
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey.shade100,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -256,20 +301,19 @@ class _PerfilScreenState extends State<PerfilScreen> {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: ButtonCustom(
+                  label: 'Salvar nova senha',
+                  variant: ButtonTipo.primary,
                   onPressed: () {
                     // Aqui você chamaria o PUT apenas para a senha
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Senha atualizada com sucesso!'), backgroundColor: Colors.green),
+                      const SnackBar(
+                        content: Text('Senha atualizada com sucesso!'),
+                        backgroundColor: Colors.green,
+                      ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E3A8A),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  child: const Text('Salvar nova senha', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -284,17 +328,27 @@ class _PerfilScreenState extends State<PerfilScreen> {
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Text(
         label,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black54),
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.black54,
+        ),
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, {bool isPassword = false}) {
+  Widget _buildTextField(
+    TextEditingController controller, {
+    bool isPassword = false,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
@@ -315,7 +369,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey.shade100, width: 1.5)),
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade100, width: 1.5),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,12 +392,21 @@ class _PerfilScreenState extends State<PerfilScreen> {
               children: [
                 Text(
                   label.toUpperCase(),
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black45, letterSpacing: 0.5),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black45,
+                    letterSpacing: 0.5,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
                 ),
               ],
             ),
@@ -356,7 +421,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF1E3A8A)))
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF1E3A8A)),
+            )
           : Column(
               children: [
                 // HEADER AZUL
@@ -374,10 +441,16 @@ class _PerfilScreenState extends State<PerfilScreen> {
                         children: [
                           IconButton(
                             onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
+                            icon: const Icon(
+                              Icons.chevron_left,
+                              color: Colors.white,
+                              size: 30,
+                            ),
                             style: IconButton.styleFrom(
                               backgroundColor: Colors.white10,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
                         ],
@@ -385,35 +458,34 @@ class _PerfilScreenState extends State<PerfilScreen> {
                       const SizedBox(height: 8),
                       Text(
                         _usuario?.nome ?? 'Usuário',
-                        style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                       const Text(
                         'Minha Conta',
-                        style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 20),
-                      
+
                       // BOTAO EDITAR/CANCELAR
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton.icon(
+                        child: ButtonCustom(
+                          label: _isEditing ? 'Cancelar Edição' : 'Editar',
+                          variant: ButtonTipo.neutral,
                           onPressed: () {
                             setState(() {
                               _isEditing = !_isEditing;
                               if (_isEditing) _preencherControllers();
                             });
                           },
-                          icon: Icon(_isEditing ? Icons.close : Icons.edit, color: _isEditing ? Colors.white : const Color(0xFF1E3A8A), size: 18),
-                          label: Text(
-                            _isEditing ? 'Cancelar Edição' : 'Editar',
-                            style: TextStyle(color: _isEditing ? Colors.white : const Color(0xFF1E3A8A), fontWeight: FontWeight.bold),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _isEditing ? Colors.white.withValues(alpha: 0.2) : Colors.white,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
                         ),
                       ),
                     ],
@@ -444,16 +516,35 @@ class _PerfilScreenState extends State<PerfilScreen> {
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: Colors.grey.shade200, width: 2),
             boxShadow: [
-              BoxShadow(color: Colors.grey.shade200, offset: const Offset(0, 4)),
+              BoxShadow(
+                color: Colors.grey.shade200,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: Column(
             children: [
-              _buildInfoRow(Icons.person_outline, 'Nome', _usuario?.nome ?? '-'),
-              _buildInfoRow(Icons.email_outlined, 'E-mail', _usuario?.email ?? '-'),
-              _buildInfoRow(Icons.smartphone_outlined, 'Celular', _usuario?.celular ?? '-'),
-              _buildInfoRow(Icons.calendar_today_outlined, 'Data de Nascimento', _usuario?.dataNascimento?.toString().split(' ').first ?? '-'),
-              
+              _buildInfoRow(
+                Icons.person_outline,
+                'Nome',
+                _usuario?.nome ?? '-',
+              ),
+              _buildInfoRow(
+                Icons.email_outlined,
+                'E-mail',
+                _usuario?.email ?? '-',
+              ),
+              _buildInfoRow(
+                Icons.smartphone_outlined,
+                'Celular',
+                _usuario?.celular ?? '-',
+              ),
+              _buildInfoRow(
+                Icons.calendar_today_outlined,
+                'Data de Nascimento',
+                _usuario?.dataNascimento?.toString().split(' ').first ?? '-',
+              ),
+
               // Botão Alterar Senha embutido no Card
               InkWell(
                 onTap: _mostrarModalSenha,
@@ -468,15 +559,34 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           color: Colors.orange.shade50,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(Icons.lock_outline, color: Colors.orange.shade700, size: 20),
+                        child: Icon(
+                          Icons.lock_outline,
+                          color: Colors.orange.shade700,
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('SENHA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black45, letterSpacing: 0.5)),
+                          Text(
+                            'SENHA',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black45,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                           SizedBox(height: 2),
-                          Text('Alterar senha →', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.blueAccent)),
+                          Text(
+                            'Alterar senha →',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blueAccent,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -496,7 +606,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.orange.shade300, width: 2),
             boxShadow: [
-              BoxShadow(color: Colors.orange.shade400, offset: const Offset(0, 4)),
+              BoxShadow(
+                color: Colors.orange.shade400,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: Row(
@@ -508,14 +621,32 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   color: Colors.orange.shade100,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.emoji_events_outlined, color: Colors.orange.shade700, size: 28),
+                child: Icon(
+                  Icons.emoji_events_outlined,
+                  color: Colors.orange.shade700,
+                  size: 28,
+                ),
               ),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Minhas Conquistas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.orange.shade900)),
-                  Text('2 desbloqueadas · Ver todas →', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.orange.shade700)),
+                  Text(
+                    'Minhas Conquistas',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.orange.shade900,
+                    ),
+                  ),
+                  Text(
+                    '2 desbloqueadas · Ver todas →',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.orange.shade700,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -529,12 +660,21 @@ class _PerfilScreenState extends State<PerfilScreen> {
           child: OutlinedButton.icon(
             onPressed: _mostrarModalExcluir,
             icon: const Icon(Icons.delete_outline, color: Colors.red),
-            label: const Text('Excluir minha conta', style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold)),
+            label: const Text(
+              'Excluir minha conta',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: Colors.red.shade50,
               side: BorderSide(color: Colors.red.shade200, width: 2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
           ),
         ),
@@ -560,11 +700,18 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 children: [
                   Icon(Icons.edit, color: Color(0xFF1E3A8A), size: 20),
                   SizedBox(width: 8),
-                  Text('Editar informações', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF1E3A8A))),
+                  Text(
+                    'Editar informações',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1E3A8A),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
-              
+
               _buildInputLabel('Nome'),
               _buildTextField(_nomeController),
               const SizedBox(height: 16),
@@ -587,18 +734,13 @@ class _PerfilScreenState extends State<PerfilScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        
+
         SizedBox(
           width: double.infinity,
-          child: ElevatedButton.icon(
+          child: ButtonCustom(
+            label: 'Salvar alterações',
+            variant: ButtonTipo.success,
             onPressed: _salvarInformacoes,
-            icon: const Icon(Icons.check_circle_outline, color: Colors.white),
-            label: const Text('Salvar alterações', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1E3A8A),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
           ),
         ),
       ],

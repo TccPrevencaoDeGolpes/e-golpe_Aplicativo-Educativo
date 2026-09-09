@@ -232,7 +232,7 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
                   : ButtonCustom(
                       label: _currentPageIndex == _totalPages - 1
                           ? 'Criar minha conta'
-                          : 'Próximo →',
+                          : 'Próximo passo',
                       variant: _currentPageIndex == _totalPages - 1
                           ? ButtonTipo.success
                           : ButtonTipo.primary,
@@ -336,7 +336,7 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _rotulo(
-            'Como quer entrar no app?',
+            'Como vpcê quer acessar o app?',
             subtitulo: 'Escolha o que for mais fácil para você:',
           ),
           Row(
@@ -361,14 +361,15 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
           const SizedBox(height: 24),
           _rotulo(
             tipoContato == 'celular'
-                ? 'Digite apenas os números (DDD) 9XXXX-XXXX'
+                ? 'Digite seu celular (DDD) + Números'
                 : 'Digite o seu e-mail',
           ),
           InputCustom(
             controller: contatoController,
             hintText: tipoContato == 'celular'
-                ? '11944443333'
+                ? '(11) 94444-33333'
                 : 'seu@email.com',
+            isPhone: tipoContato == 'celular',
           ),
           if (erroContato.isNotEmpty)
             Padding(
