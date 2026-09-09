@@ -66,7 +66,9 @@ class ButtonCustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 56, 
+      constraints: const BoxConstraints(
+        minHeight: 56,
+      ),
       width: double.infinity, 
       decoration: BoxDecoration(
         color: _backgroundColor,
@@ -75,7 +77,7 @@ class ButtonCustom extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: _shadowColor,
-            offset: const Offset(0, 4), // Efeito de sombra 3D inferior
+            offset: const Offset(0, 4), // Efeito de sombra inferior
             blurRadius: 0,
           ),
         ],
@@ -85,13 +87,17 @@ class ButtonCustom extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
           onTap: onPressed,
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 18, 
-                fontWeight: FontWeight.bold,
-                color: _textColor,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 1.5, 
+                  fontWeight: FontWeight.bold,
+                  color: _textColor,
+                ),
               ),
             ),
           ),

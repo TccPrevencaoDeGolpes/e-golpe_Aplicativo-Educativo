@@ -94,8 +94,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
             sucesso
                 ? 'Informações salvas com sucesso!'
                 : 'Erro ao salvar informações.',
+                style: const TextStyle(fontSize: 18, height: 1.4, color: Colors.white),
           ),
-          backgroundColor: sucesso ? Colors.green : Colors.red,
+          backgroundColor: sucesso ? Color(0xFF15803D) : const Color(0xFF991B1B),
         ),
       );
     }
@@ -152,20 +153,30 @@ class _PerfilScreenState extends State<PerfilScreen> {
               const SizedBox(height: 16),
               const Text(
                 'Excluir conta?',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                style: TextStyle(
+                  fontSize: 28, 
+                  height: 1.4,
+                  fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: 8),
               const Text(
                 'Essa ação é permanente. Todo o seu progresso, conquistas e dados serão apagados e não poderão ser recuperados.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54, height: 1.5),
+                style: TextStyle(
+                  color: Color(0xFF1E293B),
+                  fontSize: 18, 
+                  height: 1.5),
               ),
               const SizedBox(height: 16),
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Digite "EXCLUIR" para confirmar:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    height: 1.4,
+                    fontWeight: FontWeight.bold
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -325,13 +336,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   Widget _buildInputLabel(String label) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6.0),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         label,
         style: const TextStyle(
-          fontSize: 14,
+          fontSize: 18,
+          height: 1.5,
           fontWeight: FontWeight.bold,
-          color: Colors.black54,
+          color: Color(0xFF1E3A8A),
         ),
       ),
     );
@@ -344,10 +356,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      style: const TextStyle(fontSize: 18, height: 1.5, color: Color(0xFF1E293B)),
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 16,
+          horizontal: 16,
+          vertical: 18,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -367,25 +380,25 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Colors.grey.shade100, width: 1.5),
+          bottom: BorderSide(color: Colors.grey.shade200, width: 1.5),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: Colors.blue.shade50,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: Colors.blue.shade700, size: 20),
+            child: Icon(icon, color: Color(0xFF1E3A8A), size: 28),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,9 +406,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 Text(
                   label.toUpperCase(),
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black45,
+                    color: Color(0xFF475569),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -403,9 +416,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 Text(
                   value,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
+                    height: 1.5,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: Color(0xFF1E293B),
                   ),
                 ),
               ],
@@ -439,36 +453,42 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     children: [
                       Row(
                         children: [
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(
-                              Icons.chevron_left,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Colors.white10,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                          SizedBox(
+                            width: 48,
+                            height: 48,
+                            child: IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(
+                                Icons.chevron_left,
+                                color: Colors.white,
+                                size: 32,
+                              ),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.white10,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Text(
                         _usuario?.nome ?? 'Usuário',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 26,
+                          fontSize: 36,
+                          height: 1.4,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                       const Text(
                         'Minha Conta',
                         style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
+                          color: Colors.white,
+                          fontSize: 18,
+                          height: 1.5,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

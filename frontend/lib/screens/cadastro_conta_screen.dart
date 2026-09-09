@@ -145,55 +145,66 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (_currentPageIndex > 0) {
-                        _pageViewController.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      } else {
-                        Navigator.pushReplacementNamed(context, '/inicio');
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _currentPageIndex == 0
-                                ? Icons.close
-                                : Icons.chevron_left,
-                            color: const Color(0xFF1E3A8A),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _currentPageIndex == 0 ? 'Cancelar' : 'Voltar',
-                            style: const TextStyle(
-                              color: Color(0xFF1E3A8A),
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () {
+                        if (_currentPageIndex > 0) {
+                          _pageViewController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        } else {
+                          Navigator.pushReplacementNamed(context, '/inicio');
+                        }
+                      },
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: 48,
+                          minHeight: 48,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _currentPageIndex == 0
+                                  ? Icons.close
+                                  : Icons.chevron_left,
+                              color: const Color(0xFF1E3A8A),
+                              size: 24,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              _currentPageIndex == 0 ? 'Cancelar' : 'Voltar',
+                              style: const TextStyle(
+                                color: Color(0xFF1E3A8A),
+                                fontSize: 18, // Ajustado para 18pt
+                                height: 1.4,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 24),
                   const Text(
-                    'Cadastro',
+                    'Criar minha conta',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: 36,
+                      height: 1.4,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -201,8 +212,9 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
                   Text(
                     'PASSO ${_currentPageIndex + 1} DE $_totalPages',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Colors.white,
                       fontSize: 14,
+                      height: 1.5,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
@@ -417,7 +429,8 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
           Text(
             titulo,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 24,
+              height: 1.5,
               fontWeight: FontWeight.w800,
               color: Color(0xFF1E3A8A),
             ),
@@ -426,7 +439,12 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
             const SizedBox(height: 4),
             Text(
               subtitulo,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.5, 
+                color: Color(0xFF475569),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ],
@@ -445,7 +463,8 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
         });
       },
       child: Container(
-        height: 70,
+        constraints: const BoxConstraints(minHeight: 70),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
           color: selecionado ? const Color(0xFFDBEAFE) : Colors.white,
           borderRadius: BorderRadius.circular(14),
@@ -461,15 +480,18 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
           children: [
             Icon(
               icon,
+              size: 28,
               color: selecionado
                   ? const Color(0xFF1E3A8A)
-                  : const Color(0xFF64748B),
+                  : const Color(0xFF475569),
             ),
             const SizedBox(width: 8),
             Text(
               titulo,
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
+                height: 1.4,
                 fontWeight: FontWeight.bold,
                 color: selecionado
                     ? const Color(0xFF1E3A8A)

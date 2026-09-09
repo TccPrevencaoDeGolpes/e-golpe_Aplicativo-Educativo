@@ -57,11 +57,29 @@ class _InputCustomState extends State<InputCustom> {
               );
             }
           : null,
-      style: const TextStyle(fontSize: 18, color: Color(0xFF1E293B)),
+      style: const TextStyle(
+        fontSize: 18,
+        height: 1.5, 
+        color: Color(0xFF1E293B)),
       decoration: InputDecoration(
         labelText: widget.label,
+        labelStyle: const TextStyle(
+          fontSize: 18,
+          height: 1.5,
+          color: Color(0xFF475569)
+        ),
+        floatingLabelStyle: const TextStyle(
+          fontSize: 18,
+          height: 1.5,
+          color: Color(0xFF1E3A8A),
+          fontWeight: FontWeight.bold,
+        ),
         hintText: widget.hintText,
-        hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+        hintStyle: const TextStyle(
+          fontSize: 18,
+          height: 1.5,  
+          color: Color(0xFF94A3B8)
+        ),
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(
@@ -69,20 +87,32 @@ class _InputCustomState extends State<InputCustom> {
           vertical: 18,
         ),
         prefixIcon: widget.icon != null
-            ? Icon(widget.icon, color: const Color(0xFF64748B))
+            ? Icon(
+                widget.icon,
+                size: 28, 
+                color: const Color(0xFF64748B),
+              )
             : null,
         suffixIcon: widget.isPassword
-            ? IconButton(
-                icon: Icon(
-                  _obscureText
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: const Color(0xFF64748B),
+            ? Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: IconButton(
+                constraints: const BoxConstraints(
+                  minWidth: 56,
+                  minHeight: 56,
                 ),
-                onPressed: () {
-                  setState(() => _obscureText = !_obscureText);
-                },
-              )
+                  icon: Icon(
+                    _obscureText
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    size: 28,
+                    color: const Color(0xFF64748B),
+                  ),
+                  onPressed: () {
+                    setState(() => _obscureText = !_obscureText);
+                  },
+                ),
+            )
             : null,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

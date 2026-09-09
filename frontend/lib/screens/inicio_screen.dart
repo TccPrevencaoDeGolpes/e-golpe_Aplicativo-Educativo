@@ -136,8 +136,9 @@ class _InicioScreenState extends State<InicioScreen> {
                       const Text(
                         'Pronto para aprender?',
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 28,
+                          height: 1.5,
+                          fontWeight: FontWeight.bold,
                           color: Color(0xFF1E3A8A),
                         ),
                       ),
@@ -152,16 +153,17 @@ class _InicioScreenState extends State<InicioScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       const Text(
                         'Sem precisar criar conta',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xFF94A3B8),
+                          height: 1.5,
+                          color: Color(0xFF475569),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Botão Secundário - Fazer Login
                       ButtonCustom(
@@ -172,20 +174,29 @@ class _InicioScreenState extends State<InicioScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
 
                       // Link Criar Conta
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/cadastro');
-                        },
-                        child: const Text(
-                          'Ainda não tenho conta — Criar agora',
-                          style: TextStyle(
-                            color: Color(0xFF1E3A8A),
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                            minimumSize: const Size(48, 48),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/cadastro');
+                          },
+                          child: const Text(
+                            'Ainda não tenho conta — Criar agora',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFF1E3A8A),
+                              fontSize: 16,
+                              height: 1.5,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),

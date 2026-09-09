@@ -36,8 +36,12 @@ class _LoginScreenState extends State<LoginScreen> {
     if (loginText.isEmpty || senhaText.isEmpty) {
       messengerKey.currentState?.showSnackBar(
         const SnackBar(
-          content: Text('Por favor, preencha o e-mail/celular e a senha.'),
-          backgroundColor: Colors.orange,
+          content: Text(
+            'Por favor, preencha o e-mail/celular e a senha.',
+            style: TextStyle(fontSize: 18, height: 1.4, color: Colors.black),
+          ),
+          
+          backgroundColor: Color(0xFFFDE047),
         ),
       );
       return;
@@ -56,7 +60,10 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         messengerKey.currentState?.showSnackBar(
           const SnackBar(
-            content: Text('E-mail/celular ou senha incorretos.'),
+            content: Text(
+              'E-mail/celular ou senha incorretos.',
+              style: TextStyle(fontSize: 18, height: 1.4, color: Colors.white),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -84,53 +91,63 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    //limpar
-                    emailController.clear();
-                    senhaController.clear();
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    } else {
-                      Navigator.pushReplacementNamed(context, '/inicio');
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF), // Azul claro
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(
-                          Icons.chevron_left,
-                          color: Color(0xFF1E3A8A), // Azul escuro
-                          size: 20,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Voltar',
-                          style: TextStyle(
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      emailController.clear();
+                      senhaController.clear();
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.pushReplacementNamed(context, '/inicio');
+                      }
+                    },
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        minWidth: 48,
+                        minHeight: 48,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(
+                            Icons.chevron_left,
                             color: Color(0xFF1E3A8A),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            size: 24,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 4),
+                          Text(
+                            'Voltar',
+                            style: TextStyle(
+                              color: Color(0xFF1E3A8A),
+                              fontSize: 18,
+                              height: 1.4,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Entrar',
+                  'Acessar minha conta',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 32,
+                    fontSize: 36,
+                    height: 1.4,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -148,9 +165,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text(
                     'Já tem conta no Google? Entre rapidinho',
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF64748B),
+                      fontSize: 16,
+                      height: 1.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF334155),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -175,14 +193,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         SvgPicture.string(
                           _googleSvgLogo,
-                          width: 24,
-                          height: 24,
+                          width: 28,
+                          height: 28,
                         ),
                         const SizedBox(width: 12),
                         const Text(
                           'Continuar com Google',
                           style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 18,
+                            height: 1.5,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF1E293B),
                           ),
@@ -204,14 +223,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           'ou use seu e-mail / celular',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 15,
+                            height: 1.4,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF94A3B8),
+                            color: Color(0xFF475569),
                           ),
                         ),
                       ),
                       Expanded(
-                        child: Divider(color: Color(0xFFCBD5E1), thickness: 1),
+                        child: Divider(color: Color(0xFFCBD5E1), thickness: 1.5),
                       ),
                     ],
                   ),
@@ -266,17 +286,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Redirecionamento para Cadastro
                   Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pushReplacementNamed('/cadastro');
-                      },
-                      child: const Text(
-                        'Não tenho conta — Criar agora',
-                        style: TextStyle(
-                          color: Color(0xFF1E3A8A),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                          minimumSize: const Size(48, 48),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed('/cadastro');
+                        },
+                        child: const Text(
+                          'Não tenho conta — Criar agora',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF1E3A8A),
+                            fontSize: 16,
+                            height: 1.5,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
                     ),
