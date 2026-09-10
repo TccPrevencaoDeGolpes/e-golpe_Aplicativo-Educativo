@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/screens/cadastro_conta_screen.dart';
 import 'package:frontend/screens/inicio_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/perfil_screen.dart';
 
 final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
-void main() {
+Future<void> main() async{
+  await dotenv.load(fileName: '.env');
   runApp(const MyApp());
 }
 

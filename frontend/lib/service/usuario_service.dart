@@ -2,11 +2,12 @@ import 'dart:convert';
 import '../model/usuario.dart';
 //comando no terminal: flutter pub add http
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class UsuarioService {
   // Web / Windows: 'http://localhost:8080/usuarios'
   // Android Emulador: 'http://10.0.2.2:8080/usuarios'
-  final String _baseUrl = 'http://localhost:8080/usuarios';
+  final String _baseUrl = '${dotenv.env['API_URL']}/usuarios';
 
   //POST - Cadastrar Usuário
   Future<bool> cadastrarUsuario(Usuario usuario) async {
