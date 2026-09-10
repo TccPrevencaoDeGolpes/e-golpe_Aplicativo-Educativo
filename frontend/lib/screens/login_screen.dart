@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
             'Por favor, preencha o e-mail/celular e a senha.',
             style: TextStyle(fontSize: 18, height: 1.4, color: Colors.black),
           ),
-          
+
           backgroundColor: Color(0xFFFDE047),
         ),
       );
@@ -56,7 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       if (usuario != null) {
         // Redireciona para a tela de Perfil em caso de sucesso
-        Navigator.of(context).pushReplacementNamed('/perfil');
+        Navigator.of(context)
+            .pushReplacementNamed('/perfil', arguments: usuario);
       } else {
         messengerKey.currentState?.showSnackBar(
           const SnackBar(
@@ -231,7 +232,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       Expanded(
-                        child: Divider(color: Color(0xFFCBD5E1), thickness: 1.5),
+                        child: Divider(
+                          color: Color(0xFFCBD5E1),
+                          thickness: 1.5,
+                        ),
                       ),
                     ],
                   ),
@@ -290,11 +294,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       child: TextButton(
                         style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 8,
+                          ),
                           minimumSize: const Size(48, 48),
                         ),
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/cadastro');
+                          Navigator.of(context)
+                              .pushReplacementNamed('/cadastro');
                         },
                         child: const Text(
                           'Não tenho conta — Criar agora',

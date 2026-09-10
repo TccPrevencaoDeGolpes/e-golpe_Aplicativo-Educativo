@@ -19,7 +19,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   bool _isEditing = false;
 
   // Simulação do ID do usuário logado (Em um app real, viria do provider/sessão)
-  final int _currentUserId = 1;
+  late Usuario _currentUser;
   Usuario? _usuario;
 
   // Controllers para edição de informações
@@ -38,12 +38,22 @@ class _PerfilScreenState extends State<PerfilScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final usuario = ModalRoute.of(context)!.settings.arguments as Usuario;
+
+    _currentUser = usuario;
+
     _carregarDados();
   }
 
   Future<void> _carregarDados() async {
     setState(() => _isLoading = true);
-    final usuario = await _usuarioService.carregarUsuario(_currentUserId);
+    final usuario = await _usuarioService.carregarUsuario(_currentUser.id!);
 
     if (usuario != null) {
       setState(() {
@@ -78,7 +88,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
     _usuario!.genero = _generoController.text;
 
     final sucesso = await _usuarioService.alterarUsuario(
-      _currentUserId,
+      _currentUser.id!,
       _usuario!,
     );
 
@@ -94,9 +104,15 @@ class _PerfilScreenState extends State<PerfilScreen> {
             sucesso
                 ? 'Informações salvas com sucesso!'
                 : 'Erro ao salvar informações.',
-                style: const TextStyle(fontSize: 18, height: 1.4, color: Colors.white),
+            style: const TextStyle(
+              fontSize: 18,
+              height: 1.4,
+              color: Colors.white,
+            ),
           ),
-          backgroundColor: sucesso ? Color(0xFF15803D) : const Color(0xFF991B1B),
+          backgroundColor: sucesso
+              ? Color(0xFF15803D)
+              : const Color(0xFF991B1B),
         ),
       );
     }
@@ -104,7 +120,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   Future<void> _excluirConta() async {
     setState(() => _isLoading = true);
-    final sucesso = await _usuarioService.deletarUsuario(_currentUserId);
+    final sucesso = await _usuarioService.deletarUsuario(_currentUser.id!);
     setState(() => _isLoading = false);
 
     if (mounted) {
@@ -154,9 +170,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
               const Text(
                 'Excluir conta?',
                 style: TextStyle(
-                  fontSize: 28, 
+                  fontSize: 28,
                   height: 1.4,
-                  fontWeight: FontWeight.w900),
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -164,8 +181,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFF1E293B),
-                  fontSize: 18, 
-                  height: 1.5),
+                  fontSize: 18,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 16),
               const Align(
@@ -175,7 +193,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     height: 1.4,
-                    fontWeight: FontWeight.bold
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -356,7 +374,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
     return TextField(
       controller: controller,
       obscureText: isPassword,
-      style: const TextStyle(fontSize: 18, height: 1.5, color: Color(0xFF1E293B)),
+      style: const TextStyle(
+        fontSize: 18,
+        height: 1.5,
+        color: Color(0xFF1E293B),
+      ),
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
