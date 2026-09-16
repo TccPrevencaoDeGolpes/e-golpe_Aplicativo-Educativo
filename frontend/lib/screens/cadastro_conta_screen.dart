@@ -52,12 +52,35 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
   }
 
   void _avancarPasso() async {
+    // Validação do Passo 1
+    if (_currentPageIndex == 0) {
+      if (nomeController.text.trim().length < 2) {
+        messengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text('Informe um nome válido')),
+        );
+        return;
+      }
+      if (genero == null) {
+        messengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text('Selecione seu gênero')),
+        );
+        return;
+      }
+    }
+
     // Validação do Passo 2
     if (_currentPageIndex == 1) {
       String texto = contatoController.text;
-      if (tipoContato == 'email' && !texto.contains('@')) {
-        setState(() => erroContato = 'E-mail inválido. Inclua o @.');
-        return;
+      if (tipoContato == 'email') {
+        final email = texto.trim();
+
+        final emailValido = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+            .hasMatch(email);
+
+        if (!emailValido) {
+          setState(() => erroContato = 'Digite um e-mail válido');
+          return;
+        }
       } else if (tipoContato == 'celular') {
         String apenasNumeros = texto.replaceAll(RegExp(r'[^0-9]'), '');
         if (apenasNumeros.length != 11) {
@@ -75,7 +98,15 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      // Validação rápida de senha
+      // Validação senha
+      if (senhaController.text.length < 6) {
+        messengerKey.currentState?.showSnackBar(
+          const SnackBar(
+            content: Text('A senha devem ter pelo menos 6 caracteres'),
+          ),
+        );
+        return;
+      }
       if (senhaController.text != confirmaSenhaController.text) {
         messengerKey.currentState?.showSnackBar(
           const SnackBar(content: Text('As senhas não coincidem.')),
@@ -98,12 +129,12 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
       );
 
       // Chamada da API pelo UsuarioService
-      bool sucesso = await _usuarioService.cadastrarUsuario(novoUsuario);
+      final response = await _usuarioService.cadastrarUsuario(novoUsuario);
 
       setState(() => _isLoading = false);
 
       if (mounted) {
-        if (sucesso) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
           messengerKey.currentState?.showSnackBar(
             const SnackBar(content: Text('Usuário cadastrado com sucesso!')),
           );
@@ -114,8 +145,12 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
           );
         } else {
           messengerKey.currentState?.showSnackBar(
-            const SnackBar(
-              content: Text('Falha ao cadastrar. Tente novamente.'),
+            SnackBar(
+              content: Text(
+                response.body.isNotEmpty
+                    ? response.body
+                    : 'Falha ao cadastrar. Tente novamente.',
+              ),
             ),
           );
           // Voltar para a primeira página do cadastro
@@ -348,7 +383,7 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _rotulo(
-            'Como vpcê quer acessar o app?',
+            'Como você quer acessar o aplicativo?',
             subtitulo: 'Escolha o que for mais fácil para você:',
           ),
           Row(
@@ -373,13 +408,13 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
           const SizedBox(height: 24),
           _rotulo(
             tipoContato == 'celular'
-                ? 'Digite seu celular (DDD) + Números'
+                ? 'Digite seu celular'
                 : 'Digite o seu e-mail',
           ),
           InputCustom(
             controller: contatoController,
             hintText: tipoContato == 'celular'
-                ? '(11) 94444-33333'
+                ? '(11) 9 4444-33333'
                 : 'seu@email.com',
             isPhone: tipoContato == 'celular',
           ),
@@ -441,7 +476,7 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
               subtitulo,
               style: const TextStyle(
                 fontSize: 16,
-                height: 1.5, 
+                height: 1.5,
                 color: Color(0xFF475569),
                 fontWeight: FontWeight.w500,
               ),

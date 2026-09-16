@@ -1,5 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/button_custom.dart';
+import 'package:frontend/components/input_custom.dart';
+import 'package:frontend/main.dart';
+import 'package:frontend/screens/alterar_senha_screen.dart';
 import 'package:frontend/service/usuario_service.dart';
 
 import '../model/usuario.dart';
@@ -17,6 +21,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   // Controle de estado da tela
   bool _isLoading = true;
   bool _isEditing = false;
+  bool _dadosInicializados = false;
 
   // Simulação do ID do usuário logado (Em um app real, viria do provider/sessão)
   late Usuario _currentUser;
@@ -26,14 +31,20 @@ class _PerfilScreenState extends State<PerfilScreen> {
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _celularController = TextEditingController();
-  final TextEditingController _dataNascController = TextEditingController();
-  final TextEditingController _generoController = TextEditingController();
+  DateTime? _dataNascimentoSelecionada;
+  String? _generoSelecionado;
 
-  // Controllers para alterar senha
-  final TextEditingController _senhaAtualController = TextEditingController();
-  final TextEditingController _novaSenhaController = TextEditingController();
-  final TextEditingController _confirmarSenhaController =
-      TextEditingController();
+  String _formatarCelular(String celular) {
+    final numeros = celular.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (numeros.length != 11) {
+      return celular;
+    }
+
+    return '(${numeros.substring(0, 2)}) '
+        '${numeros.substring(2, 7)}-'
+        '${numeros.substring(7)}';
+  }
 
   @override
   void initState() {
@@ -44,11 +55,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final usuario = ModalRoute.of(context)!.settings.arguments as Usuario;
+    if(!_dadosInicializados) {
+      final usuario = ModalRoute.of(context)!.settings.arguments as Usuario;
 
-    _currentUser = usuario;
+      _currentUser = usuario;
 
-    _carregarDados();
+      _carregarDados();
+      _dadosInicializados = true;
+    }
   }
 
   Future<void> _carregarDados() async {
@@ -68,11 +82,24 @@ class _PerfilScreenState extends State<PerfilScreen> {
     if (_usuario == null) return;
     _nomeController.text = _usuario!.nome ?? '';
     _emailController.text = _usuario!.email ?? '';
-    _celularController.text = _usuario!.celular ?? '';
-    _dataNascController.text = _usuario!.dataNascimento != null
-        ? _usuario!.dataNascimento.toString().split(' ').first
-        : '';
-    _generoController.text = _usuario!.genero ?? '';
+    _dataNascimentoSelecionada = _usuario!.dataNascimento;
+    _generoSelecionado = _usuario!.genero;
+    final celular = _usuario!.celular ?? '';
+
+    if (celular.isNotEmpty) {
+      final numeros = celular.replaceAll(RegExp(r'[^0-9]'), '');
+
+      if (numeros.length == 11) {
+        _celularController.text =
+            '(${numeros.substring(0, 2)}) '
+            '${numeros.substring(2, 7)}-'
+            '${numeros.substring(7)}';
+      } else {
+        _celularController.text = celular;
+      }
+    } else {
+      _celularController.clear();
+    }
   }
 
   Future<void> _salvarInformacoes() async {
@@ -80,37 +107,46 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
     setState(() => _isLoading = true);
 
+    final celular = _celularController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (celular.isNotEmpty && celular.length != 11) {
+      setState(() => _isLoading = false);
+      messengerKey.currentState?.showSnackBar(
+        const SnackBar(content: Text('Celular deve ter 11 números com DDD.')),
+      );
+      return;
+    }
+
     // Atualiza o objeto local com os dados dos controllers
     _usuario!.nome = _nomeController.text;
     _usuario!.email = _emailController.text;
-    _usuario!.celular = _celularController.text;
-    _usuario!.dataNascimento = DateTime.parse(_dataNascController.text);
-    _usuario!.genero = _generoController.text;
+    _usuario!.celular = celular.isEmpty ? null : celular;
+    _usuario!.dataNascimento = _dataNascimentoSelecionada;
+    _usuario!.genero = _generoSelecionado;
 
-    final sucesso = await _usuarioService.alterarUsuario(
+    final response = await _usuarioService.alterarUsuario(
       _currentUser.id!,
       _usuario!,
     );
 
     setState(() {
       _isLoading = false;
-      if (sucesso) _isEditing = false;
+      if (response.statusCode == 200) _isEditing = false;
     });
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            sucesso
-                ? 'Informações salvas com sucesso!'
-                : 'Erro ao salvar informações.',
+            (response.statusCode == 200 || response.statusCode == 204)
+                ? 'Dados atualizados com sucesso!'
+                : (response.body.isNotEmpty ? response.body : 'Falha ao atualizar os dados'),
             style: const TextStyle(
               fontSize: 18,
               height: 1.4,
               color: Colors.white,
             ),
           ),
-          backgroundColor: sucesso
+          backgroundColor: (response.statusCode == 200 || response.statusCode == 204)
               ? Color(0xFF15803D)
               : const Color(0xFF991B1B),
         ),
@@ -139,219 +175,207 @@ class _PerfilScreenState extends State<PerfilScreen> {
     }
   }
 
+  // MODAL EXCLUIR
   void _mostrarModalExcluir() {
     final TextEditingController confirmarController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          contentPadding: const EdgeInsets.all(24),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.red,
-                  size: 28,
-                ),
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final podeExcluir = confirmarController.text == 'EXCLUIR';
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Excluir conta?',
-                style: TextStyle(
-                  fontSize: 28,
-                  height: 1.4,
-                  fontWeight: FontWeight.w900,
-                ),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 24,
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Essa ação é permanente. Todo o seu progresso, conquistas e dados serão apagados e não poderão ser recuperados.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFF1E293B),
-                  fontSize: 18,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Digite "EXCLUIR" para confirmar:',
-                  style: TextStyle(
-                    fontSize: 18,
-                    height: 1.4,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: confirmarController,
-                decoration: InputDecoration(
-                  hintText: 'EXCLUIR',
-                  hintStyle: TextStyle(color: Colors.red.shade200),
-                  filled: true,
-                  fillColor: Colors.red.shade50,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.red.shade200,
-                      width: 2,
+              contentPadding: const EdgeInsets.all(24),
+
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.red.shade700,
+                          size: 30,
+                        ),
+                      ),
                     ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.red.shade200,
-                      width: 2,
+
+                    const SizedBox(height: 16),
+
+                    const Text(
+                      'Excluir conta?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 28,
+                        height: 1.3,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                  ),
-                ),
-                onChanged: (val) => (context as Element)
-                    .markNeedsBuild(), // Atualiza estado local
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.grey.shade100,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
+
+                    const SizedBox(height: 10),
+
+                    const Text(
+                      'Essa ação é permanente. Seu progresso, '
+                      'conquistas e dados serão apagados e não poderão '
+                      'ser recuperados.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF1E293B),
+                        fontSize: 17,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    const Text(
+                      'Digite "EXCLUIR" para confirmar:',
+                      style: TextStyle(
+                        fontSize: 17,
+                        height: 1.4,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: confirmarController,
+                      textCapitalization: TextCapitalization.characters,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'EXCLUIR',
+                        hintStyle: TextStyle(color: Colors.red.shade300),
+                        filled: true,
+                        fillColor: Colors.red.shade50,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.red.shade200,
+                            width: 2,
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Cancelar',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: confirmarController.text == 'EXCLUIR'
-                          ? () {
-                              Navigator.pop(context);
-                              _excluirConta();
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        disabledBackgroundColor: Colors.red.shade200,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
+                        enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.red.shade200,
+                            width: 2,
+                          ),
                         ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Excluir',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.red.shade700,
+                            width: 2,
+                          ),
                         ),
                       ),
+                      onChanged: (_) {
+                        setDialogState(() {});
+                      },
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 20),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              Future.delayed(
+                                const Duration(milliseconds: 50),
+                                () {
+                                  if (context.mounted) {
+                                    Navigator.of(dialogContext).pop();
+                                  }
+                                },
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(0, 52),
+                              backgroundColor: Colors.grey.shade100,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Cancelar',
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: podeExcluir
+                                ? () {
+                                    Navigator.of(dialogContext).pop();
+                                    _excluirConta();
+                                  }
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(0, 52),
+                              backgroundColor: const Color(0xFFB91C1C),
+                              disabledBackgroundColor: Colors.red.shade200,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              'Excluir',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  void _mostrarModalSenha() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '🔑 Alterar senha',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.grey.shade100,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _buildInputLabel('Senha atual'),
-              _buildTextField(_senhaAtualController, isPassword: true),
-              const SizedBox(height: 16),
-              _buildInputLabel('Nova senha (mínimo 6 caracteres)'),
-              _buildTextField(_novaSenhaController, isPassword: true),
-              const SizedBox(height: 16),
-              _buildInputLabel('Confirmar nova senha'),
-              _buildTextField(_confirmarSenhaController, isPassword: true),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ButtonCustom(
-                  label: 'Salvar nova senha',
-                  variant: ButtonTipo.primary,
-                  onPressed: () {
-                    // Aqui você chamaria o PUT apenas para a senha
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Senha atualizada com sucesso!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
+ 
   Widget _buildInputLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -579,17 +603,36 @@ class _PerfilScreenState extends State<PerfilScreen> {
               _buildInfoRow(
                 Icons.smartphone_outlined,
                 'Celular',
-                _usuario?.celular ?? '-',
+                _usuario?.celular != null
+                    ? _formatarCelular(_usuario!.celular!)
+                    : '-',
               ),
               _buildInfoRow(
                 Icons.calendar_today_outlined,
                 'Data de Nascimento',
                 _usuario?.dataNascimento?.toString().split(' ').first ?? '-',
               ),
+              _buildInfoRow(
+                Icons.person_outline,
+                'Gênero',
+                _usuario?.genero ?? '-',
+              ),
 
               // Botão Alterar Senha embutido no Card
               InkWell(
-                onTap: _mostrarModalSenha,
+                onTap: () async {
+                  final alterouComSucesso = await
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          AlterarSenhaScreen(usuarioId: _currentUser.id!),
+                    ),
+                  );
+
+                  if(alterouComSucesso == true && mounted) {
+                    _carregarDados();
+                  }
+                },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Row(
@@ -699,25 +742,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
         // Botão Excluir Conta
         SizedBox(
           width: double.infinity,
-          child: OutlinedButton.icon(
+          child: ButtonCustom(
+            label: 'Excluir minha conta',
+            variant: ButtonTipo.neutral,
             onPressed: _mostrarModalExcluir,
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            label: const Text(
-              'Excluir minha conta',
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: Colors.red.shade50,
-              side: BorderSide(color: Colors.red.shade200, width: 2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
           ),
         ),
       ],
@@ -763,15 +791,96 @@ class _PerfilScreenState extends State<PerfilScreen> {
               const SizedBox(height: 16),
 
               _buildInputLabel('Celular'),
-              _buildTextField(_celularController),
+              InputCustom(
+                controller: _celularController,
+                hintText: '(11) 9 4444-3333',
+                isPhone: true,
+              ),
               const SizedBox(height: 16),
 
               _buildInputLabel('Data de Nascimento'),
-              _buildTextField(_dataNascController),
+              Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFCBD5E1)),
+                ),
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date,
+                  dateOrder: DatePickerDateOrder.dmy,
+                  initialDateTime:
+                      _dataNascimentoSelecionada ?? DateTime(1960, 6, 15),
+                  minimumDate: DateTime(1900, 1, 1),
+                  maximumDate: DateTime.now(),
+                  onDateTimeChanged: (novaData) {
+                    setState(() {
+                      _dataNascimentoSelecionada = novaData;
+                    });
+                  },
+                ),
+              ),
               const SizedBox(height: 16),
 
               _buildInputLabel('Gênero'),
-              _buildTextField(_generoController),
+              const Text(
+                'Selecione o seu gênero.',
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: Color(0xFF475569),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              ...['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'].map(
+                (gen) {
+                  final selecionado = _generoSelecionado == gen;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        setState(() {
+                          _generoSelecionado = gen;
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          color: selecionado
+                              ? const Color(0xFFDBEAFE)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: selecionado
+                                ? const Color(0xFF1E3A8A)
+                                : const Color(0xFFCBD5E1),
+                            width: 2,
+                          ),
+                        ),
+                        child: Text(
+                          gen,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: selecionado
+                                ? FontWeight.bold
+                                : FontWeight.w600,
+                            color: const Color(0xFF1E3A8A),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),

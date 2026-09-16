@@ -155,7 +155,7 @@ class _InicioScreenState extends State<InicioScreen> {
 
                       const SizedBox(height: 12),
                       const Text(
-                        'Sem precisar criar conta',
+                        'Sem precisar criar conta <SPRINT 2>',
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.5,

@@ -10,14 +10,13 @@ class UsuarioService {
   final String _baseUrl = '${dotenv.env['API_URL']}/usuarios';
 
   //POST - Cadastrar Usuário
-  Future<bool> cadastrarUsuario(Usuario usuario) async {
+  Future<http.Response> cadastrarUsuario(Usuario usuario) async {
     final response = await http.post(
       Uri.parse(_baseUrl),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(usuario.toJson()),
     );
-
-    return response.statusCode == 200 || response.statusCode == 201;
+    return response;
   }
   //GET - Carregar Usuário por ID
   Future<Usuario?> carregarUsuario(int id) async {
@@ -38,7 +37,7 @@ class UsuarioService {
   }
 
   //PUT - Alterar Usuário por ID
-  Future<bool> alterarUsuario(int id, Usuario usuario) async {
+  Future<http.Response> alterarUsuario(int id, Usuario usuario) async {
     try {
       final response = await http.put(
         Uri.parse('$_baseUrl/$id'),
@@ -46,10 +45,28 @@ class UsuarioService {
         body: jsonEncode(usuario.toJson()),
       );
 
-      return response.statusCode == 200;
+      return response;
     } catch (e) {
-      return false;
+      rethrow;
     }
+  }
+
+  //PUT - Alterar senha do Usuário
+  Future<http.Response> alterarSenha(
+    int id,
+    String senhaAtual,
+    String novaSenha,
+  ) async {
+    return await http.put(
+      Uri.parse('$_baseUrl/$id/senha'),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode({
+        'senhaAtual': senhaAtual,
+        'novaSenha': novaSenha,
+      }),
+    );
   }
 
   //DELETE - Deletar Usuário por ID
