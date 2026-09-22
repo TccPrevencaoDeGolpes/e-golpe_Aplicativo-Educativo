@@ -92,6 +92,7 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
     }
 
     if (_currentPageIndex < _totalPages - 1) {
+      _fecharTeclado();
       _pageViewController.animateToPage(
         _currentPageIndex + 1,
         duration: const Duration(milliseconds: 300),
@@ -114,6 +115,7 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
         return;
       }
 
+      _fecharTeclado();
       setState(() => _isLoading = true);
 
       // Instância final do Usuário usando a Model
@@ -164,11 +166,17 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
     }
   }
 
+  // Fecha o teclado antes de trocar de etapa ou sair da tela.
+  void _fecharTeclado() {
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
+
   //BUILD
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FF),
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
           children: [
@@ -176,115 +184,76 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
             Container(
               width: double.infinity,
               color: const Color(0xFF1E3A8A),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        if (_currentPageIndex > 0) {
-                          _pageViewController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        } else {
-                          Navigator.pushReplacementNamed(context, '/inicio');
-                        }
-                      },
-                      child: Container(
-                        constraints: const BoxConstraints(
-                          minWidth: 48,
-                          minHeight: 48,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _currentPageIndex == 0
-                                  ? Icons.close
-                                  : Icons.chevron_left,
-                              color: const Color(0xFF1E3A8A),
-                              size: 24,
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      _fecharTeclado();
+
+                      if (_currentPageIndex > 0) {
+                        _pageViewController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      } else {
+                        Navigator.pushReplacementNamed(context, '/inicio');
+                      }
+                    },
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        minWidth: 48,
+                        minHeight: 48,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _currentPageIndex == 0
+                                ? Icons.close
+                                : Icons.chevron_left,
+                            color: const Color(0xFF1E3A8A),
+                            size: 24,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _currentPageIndex == 0 ? 'Cancelar' : 'Voltar',
+                            style: const TextStyle(
+                              color: Color(0xFF1E3A8A),
+                              fontSize: 18,
+                              height: 1.4,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _currentPageIndex == 0 ? 'Cancelar' : 'Voltar',
-                              style: const TextStyle(
-                                color: Color(0xFF1E3A8A),
-                                fontSize: 18, // Ajustado para 18pt
-                                height: 1.4,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Criar minha conta',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
-                      height: 1.4,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'PASSO ${_currentPageIndex + 1} DE $_totalPages',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      height: 1.5,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
 
-            // CONTEÚDO
             Expanded(
               child: PageView(
                 controller: _pageViewController,
                 physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (index) {
+                onPageChanged: (index) {                  
+                  _fecharTeclado();
                   setState(() => _currentPageIndex = index);
                 },
                 children: [_buildPasso1(), _buildPasso2(), _buildPasso3()],
               ),
-            ),
-
-            // RODAPÉ rodape
-            Container(
-              padding: const EdgeInsets.all(20),
-              color: Colors.white,
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ButtonCustom(
-                      label: _currentPageIndex == _totalPages - 1
-                          ? 'Criar minha conta'
-                          : 'Próximo passo',
-                      variant: _currentPageIndex == _totalPages - 1
-                          ? ButtonTipo.success
-                          : ButtonTipo.primary,
-                      onPressed: _avancarPasso,
-                    ),
             ),
           ],
         ),
@@ -292,165 +261,226 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
     );
   }
 
+  // Estrutura compartilhada das etapas do cadastro.
+  // O título fica fora do header azul e o botão entra no fluxo do scroll.
+  Widget _buildPagina({required List<Widget> children}) {
+    return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Criar minha conta',
+                style: TextStyle(
+                  color: Color(0xFF1E3A8A),
+                  fontSize: 36,
+                  height: 1.4,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'PASSO ${_currentPageIndex + 1} DE $_totalPages',
+                style: const TextStyle(
+                  color: Color(0xFF475569),
+                  fontSize: 14,
+                  height: 1.5,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ...children,
+              const SizedBox(height: 24),
+              _buildAcaoPagina(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAcaoPagina() {
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : ButtonCustom(
+            label: _currentPageIndex == _totalPages - 1
+                ? 'Criar minha conta'
+                : 'Continuar',
+            variant: _currentPageIndex == _totalPages - 1
+                ? ButtonTipo.success
+                : ButtonTipo.primary,
+            onPressed: _avancarPasso,
+          );
+  }
+
   //Passo 1: Nome - data de nascimento e gênero
   Widget _buildPasso1() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _rotulo('Seu nome', subtitulo: 'Só o primeiro nome está ótimo!'),
-          InputCustom(controller: nomeController, hintText: 'Ex: Maria'),
-          const SizedBox(height: 24),
+    return _buildPagina(
+      children: [
+        _rotulo('Seu nome', subtitulo: 'Só o primeiro nome está ótimo!'),
+        InputCustom(controller: nomeController, hintText: 'Ex: Maria'),
+        const SizedBox(height: 24),
 
-          _rotulo(
-            'Data de nascimento',
-            subtitulo: 'Informe sua data de nascimento.',
+        _rotulo(
+          'Data de nascimento',
+          subtitulo: 'Informe sua data de nascimento.',
+        ),
+        Container(
+          height: 180,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFCBD5E1)),
           ),
-          Container(
-            height: 180,
-            decoration: BoxDecoration(
-              color: Colors.white,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            dateOrder: DatePickerDateOrder.dmy,
+            initialDateTime: dataNascimento,
+            minimumDate: DateTime(1900, 1, 1),
+            maximumDate: DateTime.now(),
+            onDateTimeChanged: (DateTime novaData) {
+              setState(() {
+                dataNascimento = novaData;
+              });
+            },
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        _rotulo('Gênero', subtitulo: 'Selecione o seu gênero.'),
+        ...['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'].map((gen) {
+          final selecionado = genero == gen;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: InkWell(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFCBD5E1)),
-            ),
-            child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.date,
-              dateOrder: DatePickerDateOrder.dmy,
-              initialDateTime: dataNascimento,
-              minimumDate: DateTime(1900, 1, 1),
-              maximumDate: DateTime.now(),
-              onDateTimeChanged: (DateTime novaData) {
-                setState(() {
-                  dataNascimento = novaData;
-                });
-              },
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          _rotulo('Gênero', subtitulo: 'Selecione o seu gênero.'),
-          ...['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'].map((
-            gen,
-          ) {
-            bool selecionado = genero == gen;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10.0),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () => setState(() => genero = gen),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
+              onTap: () => setState(() => genero = gen),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 20,
+                ),
+                decoration: BoxDecoration(
+                  color: selecionado ? const Color(0xFFDBEAFE) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: selecionado
+                        ? const Color(0xFF1E3A8A)
+                        : const Color(0xFFCBD5E1),
+                    width: 2,
                   ),
-                  decoration: BoxDecoration(
-                    // Fundo branco quando não selecionado (sem cinza)
-                    color: selecionado ? const Color(0xFFDBEAFE) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: selecionado
-                          ? const Color(0xFF1E3A8A)
-                          : const Color(0xFFCBD5E1),
-                      width: 2,
-                    ),
-                  ),
-                  child: Text(
-                    gen,
-                    style: TextStyle(
-                      fontSize: 18, // Tamanho para botões/opções (18pt)
-                      fontWeight: selecionado
-                          ? FontWeight.bold
-                          : FontWeight.w600,
-                      color: const Color(0xFF1E3A8A),
-                    ),
+                ),
+                child: Text(
+                  gen,
+                  style: TextStyle(
+                    fontSize: 18,
+                    height: 1.4,
+                    fontWeight: selecionado
+                        ? FontWeight.bold
+                        : FontWeight.w600,
+                    color: const Color(0xFF1E3A8A),
                   ),
                 ),
               ),
-            );
-          }),
-        ],
-      ),
+            ),
+          );
+        }),
+      ],
     );
   }
 
   //Passo 2: Email ou celular
   Widget _buildPasso2() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _rotulo(
-            'Como você quer acessar o aplicativo?',
-            subtitulo: 'Escolha o que for mais fácil para você:',
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: _botaoSelecaoContato(
-                  'Celular',
-                  'celular',
-                  Icons.phone_android,
-                ),
+    return _buildPagina(
+      children: [
+        _rotulo(
+          'Como você quer acessar o aplicativo?',
+          subtitulo: 'Escolha o que for mais fácil para você:',
+        ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final botoes = [
+              _botaoSelecaoContato(
+                'Celular',
+                'celular',
+                Icons.phone_android,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _botaoSelecaoContato(
-                  'E-mail',
-                  'email',
-                  Icons.email_outlined,
-                ),
+              _botaoSelecaoContato(
+                'E-mail',
+                'email',
+                Icons.email_outlined,
               ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _rotulo(
-            tipoContato == 'celular'
-                ? 'Digite seu celular'
-                : 'Digite o seu e-mail',
-          ),
-          InputCustom(
-            controller: contatoController,
-            hintText: tipoContato == 'celular'
-                ? '(11) 9 4444-33333'
-                : 'seu@email.com',
-            isPhone: tipoContato == 'celular',
-          ),
-          if (erroContato.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                erroContato,
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
+            ];
+
+            if (constraints.maxWidth < 360) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  botoes[0],
+                  const SizedBox(height: 12),
+                  botoes[1],
+                ],
+              );
+            }
+
+            return Row(
+              children: [
+                Expanded(child: botoes[0]),
+                const SizedBox(width: 12),
+                Expanded(child: botoes[1]),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 24),
+        _rotulo(
+          tipoContato == 'celular'
+              ? 'Digite seu celular'
+              : 'Digite o seu e-mail',
+        ),
+        InputCustom(
+          controller: contatoController,
+          hintText: tipoContato == 'celular'
+              ? '(11) 9 4444-33333'
+              : 'seu@email.com',
+          isPhone: tipoContato == 'celular',
+        ),
+        if (erroContato.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              erroContato,
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                height: 1.4,
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
   //Passo 3: Senha
   Widget _buildPasso3() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _rotulo('Senha', subtitulo: 'Escolha algo que só você saiba'),
-          const SizedBox(height: 8),
-          InputCustom(controller: senhaController, isPassword: true),
-          const SizedBox(height: 24),
+    return _buildPagina(
+      children: [
+        _rotulo('Senha', subtitulo: 'Escolha algo que só você saiba'),
+        const SizedBox(height: 8),
+        InputCustom(controller: senhaController, isPassword: true),
+        const SizedBox(height: 24),
 
-          _rotulo('Confirmar senha'),
-          const SizedBox(height: 8),
-          InputCustom(controller: confirmaSenhaController, isPassword: true),
-        ],
-      ),
+        _rotulo('Confirmar senha'),
+        const SizedBox(height: 8),
+        InputCustom(controller: confirmaSenhaController, isPassword: true),
+      ],
     );
   }
 
@@ -488,9 +518,11 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
   }
 
   Widget _botaoSelecaoContato(String titulo, String tipo, IconData icon) {
-    bool selecionado = tipoContato == tipo;
+    final selecionado = tipoContato == tipo;
     return InkWell(
+      borderRadius: BorderRadius.circular(14),
       onTap: () {
+        _fecharTeclado();
         setState(() {
           tipoContato = tipo;
           contatoController.clear();
@@ -521,16 +553,18 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
                   : const Color(0xFF475569),
             ),
             const SizedBox(width: 8),
-            Text(
-              titulo,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                height: 1.4,
-                fontWeight: FontWeight.bold,
-                color: selecionado
-                    ? const Color(0xFF1E3A8A)
-                    : const Color(0xFF64748B),
+            Flexible(
+              child: Text(
+                titulo,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 1.4,
+                  fontWeight: FontWeight.bold,
+                  color: selecionado
+                      ? const Color(0xFF1E3A8A)
+                      : const Color(0xFF64748B),
+                ),
               ),
             ),
           ],
