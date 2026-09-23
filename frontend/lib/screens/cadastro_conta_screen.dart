@@ -524,8 +524,10 @@ class _CadastroContaScreenState extends State<CadastroContaScreen> {
       onTap: () {
         _fecharTeclado();
         setState(() {
-          tipoContato = tipo;
+          if (tipoContato != tipo){
           contatoController.clear();
+          }
+          tipoContato = tipo;
           erroContato = '';
         });
       },
