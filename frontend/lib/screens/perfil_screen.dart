@@ -55,7 +55,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if(!_dadosInicializados) {
+    if (!_dadosInicializados) {
       final usuario = ModalRoute.of(context)!.settings.arguments as Usuario;
 
       _currentUser = usuario;
@@ -139,14 +139,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
           content: Text(
             (response.statusCode == 200 || response.statusCode == 204)
                 ? 'Dados atualizados com sucesso!'
-                : (response.body.isNotEmpty ? response.body : 'Falha ao atualizar os dados'),
+                : (response.body.isNotEmpty
+                      ? response.body
+                      : 'Falha ao atualizar os dados'),
             style: const TextStyle(
               fontSize: 18,
               height: 1.4,
               color: Colors.white,
             ),
           ),
-          backgroundColor: (response.statusCode == 200 || response.statusCode == 204)
+          backgroundColor:
+              (response.statusCode == 200 || response.statusCode == 204)
               ? Color(0xFF15803D)
               : const Color(0xFF991B1B),
         ),
@@ -232,9 +235,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     const SizedBox(height: 10),
 
                     const Text(
-                      'Essa ação é permanente. Seu progresso, '
-                      'conquistas e dados serão apagados e não poderão '
-                      'ser recuperados.',
+                      'Essa ação é permanente.\n' 
+                      ' Seu progresso, conquistas e dados serão apagados e não poderão ser recuperados.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Color(0xFF1E293B),
@@ -375,7 +377,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
     );
   }
 
- 
   Widget _buildInputLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -454,7 +455,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF475569),
+                    color: Color(0xFF1E3A8A),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -465,7 +466,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     fontSize: 18,
                     height: 1.5,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E293B),
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -489,69 +490,57 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 // HEADER AZUL
                 Container(
                   padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 16,
-                    bottom: 20,
+                    top: MediaQuery.of(context).padding.top + 8,
+                    bottom: 12,
                     left: 16,
                     right: 16,
                   ),
                   color: const Color(0xFF1E3A8A),
-                  child: Column(
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 48,
-                            height: 48,
-                            child: IconButton(
-                              onPressed: () => Navigator.pop(context),
-                              icon: const Icon(
-                                Icons.chevron_left,
-                                color: Colors.white,
-                                size: 32,
-                              ),
-                              style: IconButton.styleFrom(
-                                backgroundColor: Colors.white10,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
+                      SizedBox(
+                        height: 48,
+                        child: TextButton(
+                          onPressed: () {
+                            if(_isEditing) {
+                              setState(() {
+                                _isEditing = false;
+                                _preencherControllers();
+                              });
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                            minimumSize: const Size(48,48),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _usuario?.nome ?? 'Usuário',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 36,
-                          height: 1.4,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const Text(
-                        'Minha Conta',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          height: 1.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // BOTAO EDITAR/CANCELAR
-                      SizedBox(
-                        width: double.infinity,
-                        child: ButtonCustom(
-                          label: _isEditing ? 'Cancelar Edição' : 'Editar',
-                          variant: ButtonTipo.neutral,
-                          onPressed: () {
-                            setState(() {
-                              _isEditing = !_isEditing;
-                              if (_isEditing) _preencherControllers();
-                            });
-                          },
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.chevron_left,
+                                color:Color(0xFF1E3A8A),
+                                size: 24,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Voltar',
+                                style: TextStyle(
+                                  color: Color(0xFF1E3A8A),
+                                  fontSize: 18,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ]
+                          ),
                         ),
                       ),
                     ],
@@ -562,7 +551,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16.0),
-                    child: _isEditing ? _buildEditMode() : _buildViewMode(),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 720),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: _isEditing
+                              ? _buildEditMode()
+                              : _buildViewMode(),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -574,6 +573,50 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Widget _buildViewMode() {
     return Column(
       children: [
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            _usuario?.nome ?? 'Usuário',
+            textAlign: TextAlign.center,
+            softWrap: true,
+            style: const TextStyle(
+              color: Color(0xFF1E3A8A),
+              fontSize: 34,
+              height: 1.3,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 4),
+
+        const Text(
+          'Minha Conta',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            height: 1.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        SizedBox(
+          width: double.infinity,
+          child: ButtonCustom(
+            label: 'Editar',
+            variant: ButtonTipo.neutral,
+            onPressed: () {
+              setState(() {
+                _isEditing = true;
+                _preencherControllers();
+              });
+            },
+          ),
+        ),
+
+        const SizedBox(height: 16),
         // Card de Informações
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -620,26 +663,29 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
               // Botão Alterar Senha embutido no Card
               InkWell(
+                borderRadius: BorderRadius.circular(12),
                 onTap: () async {
-                  final alterouComSucesso = await
-                  Navigator.of(context).push(
+                  final alterouComSucesso = await Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) =>
                           AlterarSenhaScreen(usuarioId: _currentUser.id!),
                     ),
                   );
 
-                  if(alterouComSucesso == true && mounted) {
+                  if (alterouComSucesso == true && mounted) {
                     _carregarDados();
                   }
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 4,
+                  ),
                   child: Row(
                     children: [
                       Container(
-                        width: 38,
-                        height: 38,
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           color: Colors.orange.shade50,
                           borderRadius: BorderRadius.circular(10),
@@ -647,32 +693,38 @@ class _PerfilScreenState extends State<PerfilScreen> {
                         child: Icon(
                           Icons.lock_outline,
                           color: Colors.orange.shade700,
-                          size: 20,
+                          size: 24,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'SENHA',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black45,
-                              letterSpacing: 0.5,
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'SENHA',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1E3A8A),
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Alterar senha →',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blueAccent,
+
+                            SizedBox(height: 2),
+
+                            Text(
+                              'Alterar senha →',
+                              style: TextStyle(
+                                fontSize: 18,
+                                height: 1.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF991B1B),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -756,26 +808,51 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Widget _buildEditMode() {
     return Column(
       children: [
+        // Botão para cancelar a edição
+        SizedBox(
+          width: double.infinity,
+          child: ButtonCustom(
+            label: 'Cancelar Edição',
+            variant: ButtonTipo.neutral,
+            onPressed: () {
+              setState(() {
+                _isEditing = false;
+                _preencherControllers();
+              });
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: Colors.grey.shade200, width: 2),
+            border: Border.all(
+              color: Colors.grey.shade200, 
+              width: 2
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Row(
                 children: [
-                  Icon(Icons.edit, color: Color(0xFF1E3A8A), size: 20),
+                  Icon(
+                    Icons.edit, 
+                    color: Color(0xFF1E3A8A), 
+                    size: 20
+                  ),
                   SizedBox(width: 8),
-                  Text(
-                    'Editar informações',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1E3A8A),
+                  Expanded(
+                    child: Text(
+                      'Editar informações',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1E3A8A),
+                      ),
                     ),
                   ),
                 ],
@@ -788,6 +865,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
               _buildInputLabel('E-mail'),
               _buildTextField(_emailController),
+
               const SizedBox(height: 16),
 
               _buildInputLabel('Celular'),
@@ -796,11 +874,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 hintText: '(11) 9 4444-3333',
                 isPhone: true,
               ),
+
               const SizedBox(height: 16),
 
               _buildInputLabel('Data de Nascimento'),
               Container(
-                height: 180,
+                height: 200,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -828,14 +907,19 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.5,
-                  color: Color(0xFF475569),
+                  color: Colors.black,
                   fontWeight: FontWeight.w500,
                 ),
               ),
 
               const SizedBox(height: 10),
 
-              ...['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'].map(
+              ...[
+                'Masculino', 
+                'Feminino', 
+                'Outro', 
+                'Prefiro não informar'
+              ].map(
                 (gen) {
                   final selecionado = _generoSelecionado == gen;
 

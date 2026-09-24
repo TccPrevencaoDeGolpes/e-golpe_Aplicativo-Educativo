@@ -107,7 +107,52 @@ class _AlterarSenhaScreenState extends State<AlterarSenhaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: const Color(0xFFF8FAFC),
+      //header
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1E3A8A),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 60,
+        leadingWidth: 120,
+        leading: Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: TextButton(
+              onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(
+                minimumSize: const Size(48,48),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.chevron_left,
+                    color: Color(0xFF1E3A8A),
+                    size: 24,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    'Voltar',
+                    style: TextStyle(
+                      color: Color(0xFF1E3A8A),
+                      fontSize: 18,
+                      height: 1.4,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),    
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),

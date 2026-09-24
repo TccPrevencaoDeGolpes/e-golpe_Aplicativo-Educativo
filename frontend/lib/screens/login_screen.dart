@@ -80,7 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           // Header Azul
           Container(
-            width: double.infinity,
             padding: EdgeInsets.only(
               top: MediaQuery.of(context).padding.top + 12,
               left: 20,
@@ -99,6 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: () {
                       emailController.clear();
                       senhaController.clear();
+
                       if (Navigator.canPop(context)) {
                         Navigator.pop(context);
                       } else {
@@ -141,15 +141,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 16),
-                const Text(
-                  'Acessar minha conta',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 36,
-                    height: 1.4,
-                    fontWeight: FontWeight.w900,
+
+                SizedBox(
+                  width: double.infinity,
+                  child: const Text(
+                    'Acessar minha conta',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 36,
+                      height: 1.4,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
               ],
@@ -172,6 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Color(0xFF334155),
                     ),
                   ),
+
                   const SizedBox(height: 12),
 
                   // Botão do Google sem ação
@@ -179,6 +185,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {},
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 56),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       backgroundColor: Colors.white,
                       side: const BorderSide(
                         color: Color(0xFFCBD5E1),
@@ -198,51 +208,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 28,
                         ),
                         const SizedBox(width: 12),
-                        const Text(
-                          'Continuar com Google',
-                          style: TextStyle(
-                            fontSize: 18,
-                            height: 1.5,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
+                        Flexible(
+                          child: const Text(
+                            'Continuar com Google',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              height: 1.5,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1E293B),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 40),
 
-                  // Divisor
-                  Row(
-                    children: const [
-                      Expanded(
-                        child: Divider(color: Color(0xFFCBD5E1), thickness: 1),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'ou use seu e-mail / celular',
-                          style: TextStyle(
-                            fontSize: 15,
-                            height: 1.4,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF475569),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          color: Color(0xFFCBD5E1),
-                          thickness: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Campos de Texto
+                  // Campos de Login
                   const Text(
                     'E-mail ou número de celular',
                     style: TextStyle(
@@ -252,9 +236,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
+
                   InputCustom(
                     controller: emailController,
-                    hintText: 'seu@email.com ou 11944443333',
+                    hintText: '',
                     icon: Icons.email_outlined,
                   ),
 
@@ -269,6 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
+
                   InputCustom(
                     controller: senhaController,
                     isPassword: true,
@@ -281,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : ButtonCustom(
-                          label: 'Entrar →',
+                          label: 'Entrar',
                           variant: ButtonTipo.primary,
                           onPressed: _efetuarLogin,
                         ),
