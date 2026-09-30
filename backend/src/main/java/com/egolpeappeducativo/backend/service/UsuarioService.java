@@ -29,7 +29,6 @@ public class UsuarioService {
         }
 
         // EMAIL
-        // CORRIGIDO: Alterado & para &&
         if (usuario.getEmail() != null && usuario.getEmail().trim().isEmpty()) {
             usuario.setEmail(null);
         }
@@ -51,7 +50,6 @@ public class UsuarioService {
         }
 
         // CELULAR
-        // CORRIGIDO: Alterado & para &&
         if (usuario.getCelular() != null && usuario.getCelular().trim().isEmpty()) {
             usuario.setCelular(null);
         }
@@ -68,13 +66,13 @@ public class UsuarioService {
 
             Optional<Usuario> existente = usuarioRepository.findByCelular(usuario.getCelular());
 
-            // CORRIGIDO: Mensagem ajustada para "Celular já cadastrado."
+            // UNICIDADE: Mensagem "Celular já cadastrado."
             if (existente.isPresent() && existente.get().getId() != usuario.getId()) {
                 throw new IllegalArgumentException("Celular já cadastrado.");
             }
         }
 
-        // REGRA DE NEGÓCIO: PELO MENOS UM LOGIN
+        // REGRA DE NEGÓCIO: PELO MENOS UM LOGIN(EMAIL || CELULAR)
         if (usuario.getEmail() == null && usuario.getCelular() == null) {
             throw new IllegalArgumentException("É necessário cadastrar ao menos um e-mail ou celular para login.");
         }
