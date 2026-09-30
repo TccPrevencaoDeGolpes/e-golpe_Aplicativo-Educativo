@@ -158,14 +158,14 @@ class _InicioScreenState extends State<InicioScreen> {
                                 label: 'Comece agora!',
                                 variant: ButtonTipo.success,
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/cadastro');
+                                  // Navigator.pushNamed(context, '/menu');
                                 },
                               ),
 
                               const SizedBox(height: 12),
 
                               const Text(
-                                'Sem precisar criar conta <SPRINT 2>',
+                                'Sem precisar criar conta <Em breve>',
                                 style: TextStyle(
                                   fontSize: 14,
                                   height: 1.5,

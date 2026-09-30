@@ -55,9 +55,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (mounted) {
       if (usuario != null) {
-        // Redireciona para a tela de Perfil em caso de sucesso
+        // Redireciona para a tela menu em caso de sucesso
         Navigator.of(context)
-            .pushReplacementNamed('/perfil', arguments: usuario);
+            .pushReplacementNamed('/menu', arguments: usuario);
       } else {
         messengerKey.currentState?.showSnackBar(
           const SnackBar(
